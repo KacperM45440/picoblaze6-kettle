@@ -1,0 +1,342 @@
+; *****************************************************************************************************************************
+; \navGrpBegin "Directives"
+; *****************************************************************************************************************************
+
+	; *************************************************************************************************************************
+	; !!! The set directives overwrites the configuration dialog settings !!!
+	; *************************************************************************************************************************
+
+	; *************************************************************************************************************************
+	;  \navSep "Editor config"
+	; *************************************************************************************************************************
+		#set editor::tabIndent,							4
+
+	; *************************************************************************************************************************
+	; \navSep "Xilinx PicoBlaze core configuration"
+	; *************************************************************************************************************************
+		#ifDef proc::xPblze6
+	
+			#set proc::xPblze6::scrpdSize,				64						; [64, 128, 256]
+;			#set proc::xPblze6::scrpdioDev,				ioDev::yourDev
+			#set proc::xPblze6::intVector,				1023					; [0 to 4095]
+			#set proc::xPblze6::clkFreq,				80000000					; in Hz
+			
+		#elseIf proc::xPblze3
+	
+;			#set proc::XPblze3::scrpdioDev,				ioDev::yourDev
+			#set proc::XPblze3::clkFreq,				80000000					; in Hz
+		#endIf
+		
+	; *************************************************************************************************************************
+	;  \navSep "Instruction memory config"
+	; *************************************************************************************************************************
+		#set instmem::pageSize,							1024
+		#set instmem::pageCount,						1
+;		#set instmem::sharedMemLocation,				hiMem					; [ hiMem, loMem ]
+
+	; *************************************************************************************************************************
+	;  \navSep "ioDevice for instruction memory"
+	; *************************************************************************************************************************
+		#set ioDev::page0::en,							true					; [ true | false ]
+		#set ioDev::page0::type,						mem						; [ mem | fifo | reg ]
+		#set ioDev::page0::size,						1024					; Multiple of 2
+		#set ioDev::page0::baseAddr,					0x00
+		#set ioDev::page0::simEn,						false					; Enabling IO device in simulator
+; 		#set ioDev::page0::simAccessMode,				rd						; [ rdWr, rd, wr ]
+	
+		#set ioDev::page0::initValue,					0x00000					; Initial value
+	
+;		#set ioDev::page0::value,						0x33, 0x44, 0x55
+;		#set ioDev::page0::value,						0x10: 0x33, 0x44, 0x55
+;		#set ioDev::page0::value,						0x01: 0x33
+;		#set ioDev::page0::value,						0x02: 0x44
+; 		#set ioDev::page0::value,						append: 0x33, 0x44, 0x55
+; 		#set ioDev::page0::value,						append: 0x66, 0x77, 0x88
+
+		#set ioDev::page0::value,						instMem
+;		#set ioDev::page0::value,						instMem[page0]
+;		#set ioDev::page0::value,						instMem[0..1023]
+;		#set ioDev::page0::value,						instMem[page0][7..0]
+;		#set ioDev::page0::value,						instMem[0..1023][7..0]
+;		#set ioDev::page0::value,						instMem[1023..0]
+	
+	
+;		#set ioDev::page0::vhdlEn,						true					; Enable/disable vhdl output
+;		#set ioDev::page0::vhdlEntityName,				"vhdlPblzeRom"			; VHDL entity name
+;		#set ioDev::page0::vhdlTmplFile,				"tmpl.vhd"				; VHDL template file
+;		#set ioDev::page0::vhdlTargetFile,				"out.vhd"				; VHDL target file
+	
+;		#set ioDev::page0::verilogEn,					true					; Enable/disable verilog output
+;		#set ioDev::page0::verilogEntityName,			"verilogPblzeRom"		; VHDL entity name
+;		#set ioDev::page0::verilogTmplFile,				"tmpl.v"					; VHDL template file
+;		#set ioDev::page0::verilogTargetFile,			"out.v"					; VHDL target file
+	
+;		#set ioDev::page0::hexEn,						true					; Enable/disable hex output
+;		#set ioDev::page0::hexTargetFile,				"out.hex"				; Hex target file
+	
+;		#set ioDev::page0::memEn,						true					; Enable/disable mem output
+;		#set ioDev::page0::memTargetFile,				"out.mem"				; Mem target file
+;		#set ioDev::page0::memGapStuffing,				true					; Mem gap stuffing enable: [ true | false ]
+
+	; *************************************************************************************************************************
+	; \navSep "rxFIFO"
+	;
+	; Setting up a small FIFO for simulation purposes.
+	; *************************************************************************************************************************
+	
+		; rxFIFO data
+		#set ioDev::rxFIFO::en,					true					; [ true | false ]
+		#set ioDev::rxFIFO::type,				fifo					; [ mem | fifo | reg ]
+		#set ioDev::rxFIFO::size,				32						; Multiple of 2
+		#set ioDev::rxFIFO::baseAddr,			0x64
+		#set ioDev::rxFIFO::simEn,				true					; Enabling IO device in simulator
+		#set ioDev::rxFIFO::simAccessMode,		rd						; [ rdWr, rd, wr ]
+	
+		#set ioDev::rxFIFO::initValue,			0x00000					; Initial value
+
+		#set ioDev::rxFIFO::value,				append: 0x01, 0x89, 0x8d, 0x8a, 0xe7, 0xc0, 0xa0, 0x04
+		#set ioDev::rxFIFO::value,				append: 0x01, 0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x04
+
+	; *************************************************************************************************************************
+	; \navHw "Register renaming"
+	; *************************************************************************************************************************		
+
+		; W tym miejscu rezerwujemy spoty dla rejestru, tj banki pamieci na wartosci liczbowe		
+
+		; Coding manual > Directives > EQU
+        ; The EQU directive has to be used to define numeric and string constants and 
+		; renaming hardware components like registers and pages.
+
+		#equ start,				s2
+		#equ dioda, 			s3
+		#equ ilosc_wody 		s4
+		#equ temperatura, 		s5
+		
+		#equ ktora_woda			sA
+		#equ cykl,				sB
+		#equ cooldown			sC
+		#equ reg_work, 			sF
+	
+	; *************************************************************************************************************************
+	; \navHw "Port addresses"
+	; *************************************************************************************************************************
+		
+		; Praca na portach zamiast na fifo (pamieci), uzywane do sledzenia sygnalu, mozna zrobic warunkowe przekierowanie
+
+		#equ busAddr_intReg,	0x01
+		#equ busAddr_dbg,		0xFF
+		;#equ swiatla,			0xAA
+	
+; *****************************************************************************************************************************
+; \navGrpEnd
+; \navGrpBegin "Sources"
+; *****************************************************************************************************************************
+
+; *****************************************************************************************************************************
+; Main function
+; *****************************************************************************************************************************
+
+; Prawy gorny rog > HELP, najlepsza zakladka na swiecie
+
+; Aby uruchomic program, na gorze w pasku nalezy kliknac przycisk z zebatka SIM, a nastepnie RUN
+; Wyjscie z trybu SIM po zakonczeniu rowniez robi sie poprzez klikniecie tego guzika
+
+; Aby zapisac program, w tym samym pasku nalezy kliknac przycisk z zebatka ASM, a nastepnie SAVE
+
+;  If tutorial : KCPSM6_User_Guide strona 69 
+
+main:
+	
+					int		enable			; Wlacza silnik odpowiedzialny za obsluge przerwan (Interrupt, nie integer)
+
+					load dioda, 0x00		; Zaladuj rejestr "Swiatlo" z wartoscia "0x00" (czyli zero)					
+											; Znalezc mozna w prawym gornym rogu, 
+											; Processor ports > register add > numer komorki					
+					load cykl, 0x00
+					load cooldown, 0x00
+					load temperatura, 0x00	
+					load ilosc_wody, 0x31	; 0x00 <25%, 0x32 <50%, 0x4C <75%, 0x64 <100%
+					load ktora_woda, 0x00	; Dla malej wody (<50%) 5 blokow czekania, srednia 10, duza 15 		
+											; "Czekanie" polega na zapchaniu procesora instrukcjami i
+											; wymuszenie tym samym odstepow w czasie	
+					load start, 0x01
+				    
+					OR dioda, start         ; Bramka logiczna AND (moze by tu dac jednak OR?)
+											; 0x02 - 0000-0000-0000-0010
+											; Po co mi byl ten OR? Nie pamietam, ale niech siedzi
+					wrprt temperatura, 06	; WritePort - To co chcesz wywolac + numer ID dzieki ktoremu to znajdziesz, 
+											; do nadzoru
+					jump waterLoop       	; Przejdz do wykonywania petli 
+					
+				
+waterLoop:
+					comp ilosc_wody, 0x19	 ; Porownanie wartosci mniejsze/wieksze, ustawia flage zaleznie od wyniku
+					jump c, zadna_woda
+					comp ilosc_wody, 0x32
+					jump c, mala_woda
+					comp ilosc_wody, 0x4C
+					jump c, srednia_woda
+					jump duza_woda
+
+mainLoop: 		    
+					call grzej				; Zaladuj instrukcje (wykonuje sie raz)
+					jump	mainLoop        ; Koniec petli, odwolanie sie do samego siebie, skok na poczatek
+stygnieLoop:
+					call stygnie
+					jump	stygnieLoop
+	
+
+czeka:	
+		test start 0x01
+		jump c, waterLoop
+		ret
+
+grzej:		
+		add cykl, 01
+		wrprt cykl, 02
+		addc temperatura, 0x01
+		wrprt temperatura, 03
+
+		test ktora_woda, 0x01	; Sprawdz ktora wode wylosowalo, mniej wody = szybsze zagotowanie
+		call nc, delay_01
+		test ktora_woda, 0x02
+		call nc, delay_02
+		test ktora_woda, 0x03
+		call nc, delay_03
+
+		comp temperatura, 0x64
+		jump z, zatrzymaj 		; skocz w miejsce jezeli flaga c wynosi 1
+		ret						; Retain, koniec instrukcji
+
+stygnie:						; Instrukcja stygnie sprawdza temperature dwa razy
+								; Dzieki temu omijamy sytuacje w ktorej na poczatku temperatura wynosi 0
+								; a nastepnie wjezdzamy na wartosci minusowe
+		call delay_03
+		comp temperatura, 0x00
+		jump z, czeka
+		subc temperatura, 0x01
+		wrprt temperatura, 03
+		compc temperatura, 0x00
+		jump z, czeka
+		test start 0x01
+		jump c, mainLoop
+		ret
+
+                              
+zatrzymaj:
+		load dioda, 0x00
+		load start, 0x00
+		jump stygnieLoop
+		ret
+
+zadna_woda:
+		jump zatrzymaj
+		ret
+
+mala_woda:
+		load ktora_woda, 0x01
+		jump mainLoop
+		ret
+
+srednia_woda:
+		load ktora_woda, 0x02
+		jump mainLoop
+		ret
+
+duza_woda:
+		load ktora_woda, 0x03
+		jump mainLoop
+		ret
+
+delay_01:
+		wrprt cooldown, 04	; Zapchanie procesora instrukcjami w celu zasymulowania opoznien
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		ret
+
+delay_02:
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		ret
+
+delay_03:
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		wrprt cooldown, 04
+		add cooldown, 0x05
+		ret
+		
+		; sus ඞ
+	
+	
+	
+; *****************************************************************************************************************************
+; Interrupt service routine
+; *****************************************************************************************************************************
+isr:
+
+					rdPrt	reg_work,	busAddr_intReg
+					wrPrt	reg_work,	busAddr_dbg
+
+					
+					; Do your staff here
+					
+					retI	enable
+
+					#org	addr,		0x3FF
+					jump	isr
+					
+; *****************************************************************************************************************************
+; \navGrpEnd
+; *****************************************************************************************************************************
