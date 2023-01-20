@@ -163,7 +163,6 @@ main:
 				    
 					OR dioda, start         ; Bramka logiczna AND (moze by tu dac jednak OR?)
 											; 0x02 - 0000-0000-0000-0010
-											; Po co mi byl ten OR? Nie pamietam, ale niech siedzi
 					wrprt temperatura, 06	; WritePort - To co chcesz wywolac + numer ID dzieki ktoremu to znajdziesz, 
 											; do nadzoru
 					jump waterLoop       	; Przejdz do wykonywania petli 
@@ -317,7 +316,6 @@ delay_03:
 		add cooldown, 0x05
 		ret
 		
-		; sus ඞ
 	
 	
 	
